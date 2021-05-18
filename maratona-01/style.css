@@ -83,7 +83,7 @@ button:hover{
 }
 
 .button.new{
-    color: var(--white);
+    color: var(--red);
     display: inline-block;
     margin-bottom: .8rem;
 }
@@ -275,7 +275,7 @@ input{
     margin-top: 0.8rem;
 }
 
-.input-group small {
+.input-group .help {
     opacity: 0.4;
 }
 
