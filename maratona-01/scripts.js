@@ -1,18 +1,14 @@
-const Modal = {
-    open() {
-        document
-            .querySelector('.modal-overlay')
-            .classList
-            .add('active')
-    },
-    close() {
-        document
-            .querySelector('.modal-overlay')
-            .classList
-            .remove('active')
+const  Modal = {
+open(){
+    document
+    .querySelector(".modal-overlay").classList.remove('active');
+    
+},
+close(){
+    document
+    .querySelector(".modal-overlay").classList.add('active');
+}
 
-
-    }
 }
 
 const Transaction = {
@@ -22,23 +18,23 @@ const Transaction = {
             amount: -500010,
             date: '27/04/2021'
         }, {
-            
+
             description: 'Web Site',
             amount: 500000,
             date: '27/04/2021'
         }, {
-            
+
             description: 'Internet',
             amount: -200000,
             date: '27/04/2021'
         },
         {
-            
+
             description: 'App',
             amount: 200020,
             date: '27/04/2021'
         }
-        
+
     ],
     add(transaction) {
         Transaction.all.push(transaction);
@@ -46,7 +42,7 @@ const Transaction = {
         App.reload();
     },
     remove(index) {
-        Transaction.all.splice(index,  1);
+        Transaction.all.splice(index, 1);
 
         App.reload();
     },
@@ -134,6 +130,15 @@ const DOM = {
 }
 //estrutura responsável pela formatação dos valores
 const Utils = {
+    formatAmount(value) {
+        value = Number(value) * 100;
+
+        return value;
+    },
+    formatDate(date) {
+        const splittedDate = date.split("-");
+        return `${splittedDate[2]}/${splittedDate[1]}/${splittedDate[0]}`
+    },
     formatCurrency(value) {
         const signal = Number(value) < 0 ? "-" : " ";
 
@@ -151,13 +156,13 @@ const Utils = {
     }
 }
 
-const Form ={
-    description: document.querySelector('input#description' ),
-    amount: document.querySelector('input#amount' ),
-    date: document.querySelector('input#date' ),
+const Form = {
+    description: document.querySelector('input#description'),
+    amount: document.querySelector('input#amount'),
+    date: document.querySelector('input#date'),
 
     getValues() {
-        return{
+        return {
             description: Form.description.value,
             amount: Form.amount.value,
             date: Form.date.value
@@ -167,30 +172,53 @@ const Form ={
         console.log('dados formatados!');
     },
     validateFields() {
-        const {description, amount, date} = Form.getValues();
-        if(description.trim() === "" || 
-        amount.trim() === "" ||  
-        date.trim() === "") {
-            throw new Error('Dados inválidos.');
+        const { description, amount, date } = Form.getValues();
+        if (description.trim() === "" ||
+            amount.trim() === "" ||
+            date.trim() === "") {
+            throw new Error('Por favor preencha todos os campos!');
         }
+    },
+
+    formatValues() {
+        let { description, amount, date } = Form.getValues();
+
+        amount = Utils.formatAmount(Number(amount));
+        date = Utils.formatDate(date);
+
+        return {
+            description,
+            amount,
+            date
+        }
+    },
+
+    clearFields(){
+        Form.description.value = ""
+        Form.amount.value = ""
+        Form.date.value = ""
 
     },
+
     submit(event) {
         event.preventDefault()
 
-        try{
-        //verificar os campos se validaram corretamente
-        Form.validateFields();
-        //formatar os dados para salvar
-        //Form.formatData();
-        //salvar
-        //apagar os dados do formulario
-        //modal fecha
-        //atualizar  a  aplicação
-        } catch (error){
+        try {
+            //verificar os campos se validaram corretamente
+            Form.validateFields();
+            //formatar os dados para salvar
+            const transaction = Form.formatValues();
+            //salvar
+            Transaction.add(transaction);
+            //apagar os dados do formulario
+            Form.clearFields();
+            //modal fecha
+            Modal.close();
+            //atualizar  a  aplicação
+        } catch (error) {
             alert(error.message);
         }
-    }    
+    }
 }
 //inicia o app, popula as tabelas, limpa as mesmas e reinicia o App
 const App = {
@@ -198,6 +226,7 @@ const App = {
     init() {
         Transaction.all.forEach(transaction => {
             DOM.addTransaction(transaction);
+            Modal.close();
         })
 
         DOM.updateBalance()
